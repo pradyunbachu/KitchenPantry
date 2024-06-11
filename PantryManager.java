@@ -15,7 +15,7 @@ public class PantryManager {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the name of the pantry file you want to load:");
+        System.out.println("Please enter the name of the pantry file you want to load (or create a new one 'name.txt'):");
         String fileName = scanner.nextLine();
         filePath = directoryPath + fileName;
 
@@ -158,7 +158,7 @@ public class PantryManager {
                 pantry.put(shelf, itemList);
             }
             System.out.println("Pantry loaded from file successfully.");
-        } catch (IOException e) {
+        } catch (IOException e) {                                           //Still lost about this part chatgpt said to add it?
             System.out.println("Error loading pantry from file.");
             e.printStackTrace();
         } catch (ArrayIndexOutOfBoundsException e) {
