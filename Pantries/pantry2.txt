@@ -1,1 +1,1 @@
-Shelf2:carrot,water,potato
+Shelf1:carrot (2),

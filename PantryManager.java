@@ -2,19 +2,20 @@
 //Pradyun Bachu
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class PantryManager {
 
-    private static HashMap<String, ArrayList<String>> pantry = new HashMap<>();
+    private static HashMap<String, HashMap<String, Integer>> pantry = new HashMap<>();
     private static String directoryPath = "/Users/pradyunbachu/Documents/CS_Projects/Side_Projects/KitchenPantry/Pantries/";
     private static String filePath;
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
+        System.out.println("_______________________________________________________________________________________________________________________________________________");
+        System.out.println("Welcome to the Pantry Manager Program");
         System.out.println("Please enter the name of the pantry file you want to load (or create a new one 'name.txt'):");
         String fileName = scanner.nextLine();
         filePath = directoryPath + fileName;
@@ -63,7 +64,7 @@ public class PantryManager {
         System.out.println("Please type the name of the shelf you would like to add:");
         String shelf = scanner.nextLine();
         if (!pantry.containsKey(shelf)) {
-            pantry.put(shelf, new ArrayList<>());
+            pantry.put(shelf, new HashMap<>());
             System.out.println("Shelf " + shelf + " added to pantry.");
         } else {
             System.out.println("Shelf " + shelf + " already exists.");
@@ -76,7 +77,8 @@ public class PantryManager {
         if (pantry.containsKey(shelf)) {
             System.out.println("Please type the item you would like to add:");
             String item = scanner.nextLine();
-            pantry.get(shelf).add(item);
+            HashMap<String, Integer> items = pantry.get(shelf);
+            items.put(item, items.getOrDefault(item, 0) + 1);
             System.out.println(item + " added to shelf " + shelf);
         } else {
             System.out.println("Shelf " + shelf + " does not exist. Please add the shelf first.");
@@ -88,8 +90,8 @@ public class PantryManager {
         String shelf = scanner.nextLine();
         if (pantry.containsKey(shelf)) {
             System.out.println("Items on shelf " + shelf + ":");
-            for (String item : pantry.get(shelf)) {
-                System.out.println(" - " + item);
+            for (HashMap.Entry<String, Integer> entry : pantry.get(shelf).entrySet()) {
+                System.out.println(" - " + entry.getKey() + " (" + entry.getValue() + ")");
             }
         } else {
             System.out.println("Shelf " + shelf + " does not exist.");
@@ -100,8 +102,8 @@ public class PantryManager {
         System.out.println("The pantry currently consists of:");
         for (String shelf : pantry.keySet()) {
             System.out.println("Shelf " + shelf + ":");
-            for (String item : pantry.get(shelf)) {
-                System.out.println(" - " + item);
+            for (HashMap.Entry<String, Integer> entry : pantry.get(shelf).entrySet()) {
+                System.out.println(" - " + entry.getKey() + " (" + entry.getValue() + ")");
             }
         }
     }
@@ -127,7 +129,9 @@ public class PantryManager {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
             for (String shelf : pantry.keySet()) {
                 bw.write(shelf + ":");
-                bw.write(String.join(",", pantry.get(shelf)));
+                for (HashMap.Entry<String, Integer> entry : pantry.get(shelf).entrySet()) {
+                    bw.write(entry.getKey() + " (" + entry.getValue() + "),");
+                }
                 bw.newLine();
             }
             System.out.println("Pantry saved to file successfully.");
@@ -151,14 +155,17 @@ public class PantryManager {
                 if (parts.length < 2) continue; // Handle malformed lines
                 String shelf = parts[0];
                 String[] items = parts[1].split(",");
-                ArrayList<String> itemList = new ArrayList<>();
+                HashMap<String, Integer> itemList = new HashMap<>();
                 for (String item : items) {
-                    itemList.add(item);
+                    String[] itemParts = item.trim().split(" \\(");
+                    String itemName = itemParts[0];
+                    int itemCount = Integer.parseInt(itemParts[1].replace(")", ""));
+                    itemList.put(itemName, itemCount);
                 }
                 pantry.put(shelf, itemList);
             }
             System.out.println("Pantry loaded from file successfully.");
-        } catch (IOException e) {                                           //Still lost about this part chatgpt said to add it?
+        } catch (IOException e) {
             System.out.println("Error loading pantry from file.");
             e.printStackTrace();
         } catch (ArrayIndexOutOfBoundsException e) {
